@@ -1,8 +1,11 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import './App.css'
+import RegisterForm from './components/RegisterForm'
 
 function App() {
   const [count, setCount] = useState(0)
+
+
 
   return (
     <>
@@ -18,7 +21,11 @@ function App() {
         </nav>
       </header>
       <body>
+        <RegisterForm/>
         <h1>TASKS</h1>
+        <div className='tasks-container'>
+
+        </div>
         <div className="card">
           <button onClick={() => setCount((count) => count + 1)}>
             count is {count}
