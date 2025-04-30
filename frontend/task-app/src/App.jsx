@@ -20,7 +20,7 @@ function App() {
           </div>
         </nav>
       </header>
-      <body>
+      <main>
         <RegisterForm/>
         <h1>TASKS</h1>
         <div className='tasks-container'>
@@ -38,7 +38,7 @@ function App() {
         <p className="read-the-docs">
           Click on the Vite and React logos to learn more
         </p>
-      </body>
+      </main>
       <footer>
         <p>Aquí va el footer.</p>
       </footer>

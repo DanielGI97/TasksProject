@@ -40,17 +40,17 @@ const RegisterForm = () => {
       setMessage('Error en la conexión');
     }
   };
-
+  console.log("funciono")
   return (
     <form onSubmit={handleSubmit}>
       <h2>Registro de Usuario</h2>
-
       <label>
         Username:
         <input
           type="text"
           name="username"
           value={formData.username}
+          placeholder='Hola que tal'
           onChange={handleChange}
           required
         />
@@ -89,6 +89,8 @@ const RegisterForm = () => {
       {message && <p>{message}</p>}
     </form>
   );
+  console.log("te follo el culo")
 };
+
 
 export default RegisterForm;
