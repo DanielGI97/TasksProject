@@ -1,49 +1,55 @@
-import { useState, useEffect } from 'react'
 import './App.css'
+import { useState, useEffect } from 'react';
+import LoginForm from './components/LoginForm';
+import TaskList from './components/TaskList';
 import RegisterForm from './components/RegisterForm'
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [token, setToken] = useState(localStorage.getItem('access') || null);
 
+  const handleLogin = (accessToken, refreshToken) => {
+    localStorage.setItem('access', accessToken);
+    localStorage.setItem('refresh', refreshToken);
+    setToken(accessToken);
+  };
 
+  const handleLogout = () => {
+    localStorage.removeItem('access');
+    localStorage.removeItem('refresh');
+    setToken(null);
+  };
 
   return (
-    <>
+    <Router>
+
       <header>
-        <nav>
-          <div className='logoName'>
-            <p>Task App</p>
-          </div>
-          <div className='imageUser'>           
-            <img className='imgUser' src='#' alt='Image user' title='Image user'/>
-            <p>User</p>
-          </div>
-        </nav>
+
+        <h1>Task App</h1>
+        {token && <button onClick={handleLogout}>Cerrar sesión</button>}
+
       </header>
       <main>
-        <RegisterForm/>
-        <h1>TASKS</h1>
-        <div className='tasks-container'>
 
-        </div>
-        <div className="card">
-          <button onClick={() => setCount((count) => count + 1)}>
-            count is {count}
-          </button>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test HMR,<br/ >
-            The components are in <code>src/components</code>
-          </p>
-        </div>
-        <p className="read-the-docs">
-          Click on the Vite and React logos to learn more
-        </p>
+        <Routes>
+
+          {!token ? (
+            <>
+              <Route path="/login" element={<LoginForm onLogin={handleLogin} />}></Route>
+              <Route path="/register" element={<RegisterForm/>}></Route>
+              <Route path="*" element={<Navigate to="/login"></Navigate>}></Route>
+            </>           
+          ) : (
+            <>
+              <Route path="/tasks" element={<TaskList token={token} />}></Route>
+              <Route path="*" element={<Navigate to="/tasks"></Navigate>}></Route>
+            </>
+            
+          )}
+        </Routes>
       </main>
-      <footer>
-        <p>Aquí va el footer.</p>
-      </footer>
-    </>
-  )
+    </Router>
+  );
 }
 
-export default App
+export default App;

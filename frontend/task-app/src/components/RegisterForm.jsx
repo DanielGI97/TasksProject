@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 const RegisterForm = () => {
   const [formData, setFormData] = useState({
@@ -36,58 +37,63 @@ const RegisterForm = () => {
         setMessage(data.error || 'Error en el registro');
       }
     } catch (err) {
-      console.error('Error:', err);
+      console.error('Error al registrar el usuario: ', err);
       setMessage('Error en la conexión');
     }
   };
-  console.log("funciono")
+
   return (
-    <form onSubmit={handleSubmit}>
-      <h2>Registro de Usuario</h2>
-      <label>
-        Username:
-        <input
-          type="text"
-          name="username"
-          value={formData.username}
-          placeholder='Hola que tal'
-          onChange={handleChange}
-          required
-        />
-      </label>
+    <div>
+      <form onSubmit={handleSubmit}>
+        <h2>Registro de Usuario</h2>
+        <label>
+          Username:
+          <input
+            type="text"
+            name="username"
+            value={formData.username}
+            placeholder='Introducir usuario'
+            onChange={handleChange}
+            required
+          />
+        </label>
 
-      <br />
+        <br />
 
-      <label>
-        Email:
-        <input
-          type="email"
-          name="email"
-          value={formData.email}
-          onChange={handleChange}
-          required
-        />
-      </label>
+        <label>
+          Email:
+          <input
+            type="email"
+            name="email"
+            value={formData.email}
+            placeholder='Introducir email'
+            onChange={handleChange}
+            required
+          />
+        </label>
 
-      <br />
+        <br />
 
-      <label>
-        Contraseña:
-        <input
-          type="password"
-          name="password"
-          value={formData.password}
-          onChange={handleChange}
-          required
-        />
-      </label>
+        <label>
+          Contraseña:
+          <input
+            type="password"
+            name="password"
+            value={formData.password}
+            placeholder='Introducir contraseña'
+            onChange={handleChange}
+            required
+          />
+        </label>
 
-      <br />
+        <br />
 
-      <button type="submit">Registrarse</button>
+        <button type="submit">Registrarse</button>
 
-      {message && <p>{message}</p>}
-    </form>
+        {message && <p>{message}</p>}
+      </form>
+      <p>¿Tienes cuenta ya? <Link to="/login">Iniciar Sesión</Link></p>
+    </div>
   );
   console.log("te follo el culo")
 };

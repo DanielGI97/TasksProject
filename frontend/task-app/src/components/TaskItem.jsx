@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const TaskItem = ({ id, title, description, completed, category, created_date, due_date, resetpatterns, onToggle}) => {
+const TaskItem = ({ id, title, description, completed, category, created_date, due_date, resetpatterns, onToggle, token}) => {
     const [checked, setChecked] = useState(completed);
 
     const handleChecked = () => {
@@ -22,6 +22,8 @@ const TaskItem = ({ id, title, description, completed, category, created_date, d
         </div>
     );
 };
+
+export default TaskItem;
 /*
 const TaskItem2 = ({ id, title, completed, resetpatterns, onToggle }) => {
     return (
