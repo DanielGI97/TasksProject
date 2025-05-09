@@ -18,9 +18,17 @@ from django.contrib import admin
 from django.urls import include, path
 from rest_framework import routers
 from api_tasks import views
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
+from api_tasks.serializers import CustomTokenObtainPairSerializer
 
 router = routers.DefaultRouter()
 router.register(r'users', views.UserViewSet)
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer
 
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browsable API.
@@ -28,5 +36,7 @@ urlpatterns = [
     path('', include(router.urls)),
     path('api/', include('api_tasks.urls')),
     path('admin/', admin.site.urls),
-    path('api-auth/', include('rest_framework.urls', namespace='rest_framework'))
+    path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    path('api/token/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),  # Login
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'), # Refresh
 ]

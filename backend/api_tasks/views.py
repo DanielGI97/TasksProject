@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from django.contrib.auth.models import User
 from api_tasks.models import Category, Task
 from rest_framework import permissions, viewsets
@@ -16,6 +15,10 @@ def tasks_list(request,format=None):
     """
     List all code snippets, or create a new snippet.
     """
+
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+
     try:
         tasks = Task.objects.filter(user=request.user)
     except Task.DoesNotExist:
@@ -28,7 +31,7 @@ def tasks_list(request,format=None):
     elif request.method == 'POST':
         serializer = TaskSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
+            serializer.save(user=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
@@ -36,7 +39,7 @@ def tasks_list(request,format=None):
         task = Task.objects.filter(id=id)
         serializer = TaskSerializer(task, data=request.data)
         if serializer.is_valid():
-            serializer.save()
+            serializer.save(owner=request.user)
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

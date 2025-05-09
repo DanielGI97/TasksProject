@@ -1,6 +1,8 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
 from api_tasks.models import Task, Category, ResetPattern
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from django.contrib.auth import authenticate
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -16,17 +18,31 @@ class CategorySerializer(serializers.ModelSerializer):
         model = Category
         fields = ['__all__']
 
-class ResetPatternSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = ResetPattern
-        fields = ['__all__']
-
 class TaskSerializer(serializers.ModelSerializer):
     
-    user = serializers.StringRelatedField(read_only=True)
-    resetpatterns = ResetPatternSerializer(many=True, read_only=True)
+    user = serializers.ReadOnlyField(source='user.username')
 
     class Meta:
         model = Task
-        fields = ['__all__']
+        fields = ['__all__', 'user','resetpatterns']
+
+
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    def validate(self, attrs):
+        username_or_email = attrs.get("username")
+        password = attrs.get("password")
+
+        # Intenta obtener el usuario por email si no existe por username
+        try:
+            user = User.objects.get(email=username_or_email)
+            username = user.username
+        except User.DoesNotExist:
+            username = username_or_email
+
+        user = authenticate(username=username, password=password)
+
+        if not user:
+            raise serializers.ValidationError("Credenciales inválidas.")
+
+        data = super().validate(attrs)
+        return data
