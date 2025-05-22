@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import TaskItem from './TaskItem';
 import TaskForm from './TaskForm';
+import { authFetch } from '../utils/authFetch';
 
 const TaskList = ({ token }) => {
   const [tasks, setTasks] = useState([]);
@@ -13,7 +14,8 @@ const TaskList = ({ token }) => {
   useEffect(() => {
     setLoading(true);
     setErrorTask(false);
-    fetch('/api/tasks/', {
+    authFetch('/api/tasks/', {
+      method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'
@@ -39,6 +41,10 @@ const TaskList = ({ token }) => {
     setLookTaskForm(false);
   }
 
+  const handleDeleteTask = (id) => {
+    setTasks(prevTasks => prevTasks.filter(task => task.id !== id));
+  };
+
   if (loading) {
     return <div>Cargando tareas...</div>;
   }
@@ -59,7 +65,7 @@ const TaskList = ({ token }) => {
         <div>No hay tareas disponibles.</div>
       ) : (
         tasks.map(task => (
-          <TaskItem key={task.id} {...task} token={token}/>
+          <TaskItem key={task.id} {...task} onDelete={handleDeleteTask} token={token}/>
         ))
       )}
     </div>

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { authFetch } from '../utils/authFetch';
 
 const LoginForm = ({ onLogin }) => {
   const [formData, setFormData] = useState({ username: '', password: '' });
@@ -16,7 +17,7 @@ const LoginForm = ({ onLogin }) => {
     e.preventDefault();
 
     try {
-      const res = await fetch('/api/token/', {
+      const res = await authFetch('/api/token/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

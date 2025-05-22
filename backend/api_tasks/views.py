@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from api_tasks.models import Category, Task
 from rest_framework import permissions, viewsets
-from api_tasks.serializers import UserSerializer, CategorySerializer, TaskSerializer, ResetPatternSerializer
+from api_tasks.serializers import UserSerializer, CategorySerializer, TaskSerializer
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
@@ -9,7 +9,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 
 # Create your views here.
 
-@api_view(['GET','POST', 'PUT', 'DELETE'])
+@api_view(['GET','POST'])
 @permission_classes([IsAuthenticated])
 def tasks_list(request,format=None):
     """
@@ -34,20 +34,6 @@ def tasks_list(request,format=None):
             serializer.save(user=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    elif request.method == 'PUT':
-        task = Task.objects.filter(id=id)
-        serializer = TaskSerializer(task, data=request.data)
-        if serializer.is_valid():
-            serializer.save(owner=request.user)
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-    elif request.method == 'DELETE':
-        task = Task.objects.filter(id=id)
-        task.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
 
 class UserViewSet(viewsets.ModelViewSet):
     """
@@ -79,3 +65,34 @@ def register_user(request):
 
     user = User.objects.create_user(username=username, email=email, password=password)
     return Response({'message': 'Usuario creado correctamente.'}, status=status.HTTP_201_CREATED)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def category_list(request):
+    try:
+        categories = Category.objects.all()
+        categories_serializer = CategorySerializer(categories, many=True)
+        return Response(categories_serializer.data)
+    except Category.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    
+@api_view(['PATCH','DELETE'])
+@permission_classes([IsAuthenticated])
+def task_detail(request, pk):
+
+    try:
+        task = Task.objects.get(id=pk, user=request.user)
+
+    except Task.DoesNotExist:
+        return Response({'error': 'Tarea no encontrada'}, status=404)
+    
+    if request.method == 'PATCH':
+        serializer = TaskSerializer(task, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=400)
+    
+    if request.method == 'DELETE':
+        task.delete()
+        return Response({'message': 'Tarea eliminada correctamente'}, status=204)

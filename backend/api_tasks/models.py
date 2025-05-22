@@ -24,9 +24,9 @@ class Task(models.Model):
     description = models.TextField(blank=True, null=True) #not required, i have to delete this field.
     completed = models.BooleanField(default=False) #required
     category = models.ForeignKey(
-        Category, 
+        Category.name,
         on_delete=models.SET_NULL, 
-        null=True, 
+        null=True,
         related_name='tasks',
     ) #not required
     created_date = models.DateTimeField(auto_now_add=True) #required

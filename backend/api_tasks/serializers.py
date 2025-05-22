@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
-from api_tasks.models import Task, Category, ResetPattern
+from api_tasks.models import Task, Category
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.contrib.auth import authenticate
 
@@ -16,7 +16,7 @@ class CategorySerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Category
-        fields = ['__all__']
+        fields = '__all__'
 
 class TaskSerializer(serializers.ModelSerializer):
     
@@ -24,7 +24,7 @@ class TaskSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Task
-        fields = ['__all__', 'user','resetpatterns']
+        fields = '__all__'
 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
