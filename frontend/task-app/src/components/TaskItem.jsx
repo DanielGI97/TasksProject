@@ -71,7 +71,6 @@ const TaskItem = ({ id, title, description, completed, category, created_date, r
 
     const handleModify = async () => {
       setLookModify(!lookModify);
-
     }
 
     return (
@@ -81,11 +80,31 @@ const TaskItem = ({ id, title, description, completed, category, created_date, r
           /*En caso de que sí, se pondrán */
           <div className='card-task'>
             <input
-                type='text'
-                value={title}
-                disabled={updating}
-                onChange={(e) => handleChecked}
+              type='text'
+              placeholder={title}
+              disabled={updating}
+              onChange={(e) => 
+                setFormUpdate((prev) => ({
+                  ...prev,
+                  title: e.target.value,
+                }))
+              }
             />
+            <select 
+            name='reset_interval'
+            value={formUpdate.reset_interval || ''}
+            onChange={(e) => {
+              setFormUpdate((prev) => ({
+                ...prev,
+                reset_interval: parseInt(e.target.value),
+              }))
+            }}
+            >
+              <option value='1'>Diario</option>
+              <option value='7'>Semanal</option>
+              <option value='30'>Mensual</option>
+            </select>
+
             <button
               onClick={handleModify}
             >Confirmar</button>
