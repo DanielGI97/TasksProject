@@ -21,18 +21,32 @@ class Task(models.Model):
     ) #required
     
     title = models.CharField(max_length=200) #required
-    description = models.TextField(blank=True, null=True) #not required, i have to delete this field.
     completed = models.BooleanField(default=False) #required
-    category = models.ForeignKey(
-        Category,
-        on_delete=models.SET_NULL, 
-        null=True,
-        related_name='tasks',
-    ) #not required
     created_date = models.DateTimeField(auto_now_add=True) #required
     last_date_updated = models.DateField(blank=True, null=True) #not required
     reset_interval = models.IntegerField(blank=True, null=True) #not required
     next_date_update = models.DateField(blank=True, null=True) #not required
+    
+    def __str__(self):
+        return self.title
+    
+class TaskList(models.Model):
+
+    tasks = models.ForeignKey(
+        Task,
+        on_delete = models.DO_NOTHING,
+        related_name='tasks'
+    )
+    
+    user = models.ForeignKey(
+        User, 
+        on_delete=models.CASCADE, 
+        related_name='tasks_list',
+    ) #required
+    
+    title = models.CharField(max_length=200, null=True) #required
+    created_date = models.DateTimeField(auto_now_add=True) #required
+    last_task_updated = models.DateField(blank=True, null=True) #not required
     
     def __str__(self):
         return self.title

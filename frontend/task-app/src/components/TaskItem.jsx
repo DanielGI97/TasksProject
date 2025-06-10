@@ -12,7 +12,6 @@ const TaskItem = ({ id, title, description, completed, category, created_date, r
             description: '',
             completed: completed,
             reset_interval: reset_interval,
-            category: null,
             last_date_update: last_date_update,
             next_date_update: next_date_update,
         });
@@ -54,6 +53,7 @@ const TaskItem = ({ id, title, description, completed, category, created_date, r
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`,
           },
+          body: JSON.stringify({id: id}),
         });
 
         if (res.ok) {
@@ -68,8 +68,33 @@ const TaskItem = ({ id, title, description, completed, category, created_date, r
       }
     }
 
-    const handleModify = async () => {
+    const handleModify = async (e) => {
       setLookModify(!lookModify);
+      e.preventDefault();
+        console.log('UPDATE - Se comienza: ',formUpdate);
+        try {
+            const res = await authFetch('api/tasks/',{
+                method : 'PATCH',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                  },
+                body : JSON.stringify(formUpdate),
+            });
+
+            const data = await res.json();
+
+            if (res.ok) {
+                setMessage('Tarea modificada correctamente.');
+                setFormData({title: '', description: '', reset_interval: 'daily'});
+                onTaskCreated(data);
+            } else {
+                setMessage(data.error || 'Error al registrar la tarea');
+            }
+        } catch (error) {
+            console.log('Error al registrar la tarea: ', error);            
+            setMessage('Ha habido un error a la hora de crear la tarea.');
+        }
     }
 
     return (
@@ -91,7 +116,7 @@ const TaskItem = ({ id, title, description, completed, category, created_date, r
             />
             <select 
             name='reset_interval'
-            value={formUpdate.reset_interval || 1}
+            value={formUpdate.reset_interval || ''}
             onChange={(e) => {
               setFormUpdate((prev) => ({
                 ...prev,
@@ -105,7 +130,7 @@ const TaskItem = ({ id, title, description, completed, category, created_date, r
             </select>
 
             <button
-              onClick={handleModify}
+              onClick={handleConfirmModify}
             >Confirmar</button>
             <button
               onClick={()=>{setLookModify(false)}}
@@ -136,3 +161,22 @@ const TaskItem = ({ id, title, description, completed, category, created_date, r
 };
 
 export default TaskItem;
+/*
+const TaskItem2 = ({ id, title, completed, resetpatterns, onToggle }) => {
+    return (
+      <div>
+        <input
+          type="checkbox"
+          checked={completed}
+          onChange={() => onToggle(id)}
+        />
+        <span>{title}</span>
+        <ul>
+          {resetpatterns.map(rp => (
+            <li key={rp.id}>{rp.pattern}</li>
+          ))}
+        </ul>
+      </div>
+    );
+  };
+  */
