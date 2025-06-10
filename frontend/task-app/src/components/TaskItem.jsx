@@ -12,7 +12,7 @@ const TaskItem = ({ id, title, description, completed, category, created_date, r
             description: '',
             completed: completed,
             reset_interval: reset_interval,
-            category: category,
+            category: null,
             last_date_update: last_date_update,
             next_date_update: next_date_update,
         });
@@ -54,7 +54,6 @@ const TaskItem = ({ id, title, description, completed, category, created_date, r
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`,
           },
-          body: JSON.stringify({id: id}),
         });
 
         if (res.ok) {
@@ -92,7 +91,7 @@ const TaskItem = ({ id, title, description, completed, category, created_date, r
             />
             <select 
             name='reset_interval'
-            value={formUpdate.reset_interval || ''}
+            value={formUpdate.reset_interval || 1}
             onChange={(e) => {
               setFormUpdate((prev) => ({
                 ...prev,
@@ -137,22 +136,3 @@ const TaskItem = ({ id, title, description, completed, category, created_date, r
 };
 
 export default TaskItem;
-/*
-const TaskItem2 = ({ id, title, completed, resetpatterns, onToggle }) => {
-    return (
-      <div>
-        <input
-          type="checkbox"
-          checked={completed}
-          onChange={() => onToggle(id)}
-        />
-        <span>{title}</span>
-        <ul>
-          {resetpatterns.map(rp => (
-            <li key={rp.id}>{rp.pattern}</li>
-          ))}
-        </ul>
-      </div>
-    );
-  };
-  */

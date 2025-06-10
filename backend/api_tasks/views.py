@@ -6,8 +6,20 @@ from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from django.utils import timezone
+from datetime import timedelta
 
 # Create your views here.
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def user_content(request, user_id,format=None):
+    return Response()
+
+@api_view(['GET','DELETE'])
+@permission_classes([IsAuthenticated])
+def list_content(request,format=None):
+    return Response()
 
 @api_view(['GET','POST'])
 @permission_classes([IsAuthenticated])
@@ -21,6 +33,7 @@ def tasks_list(request,format=None):
 
     try:
         tasks = Task.objects.filter(user=request.user)
+        print(tasks)
     except Task.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -29,9 +42,21 @@ def tasks_list(request,format=None):
         return Response(serializer.data)
 
     elif request.method == 'POST':
-        serializer = TaskSerializer(data=request.data)
+        print('Entramos al POST.')
+        data = request.data.copy()
+        now = timezone.now().date()
+
+        data['user'] = request.user.username
+        data['last_date_update'] = now
+        if data.get('reset_interval'):
+            data['next_date_update'] = now + timedelta(days=int(data['reset_interval']))
+        
+        serializer = TaskSerializer(data=data)
+        print('Serializamos la data.')
+        print('Información del serializar: ', serializer)
         if serializer.is_valid():
             serializer.save(user=request.user)
+            print('Guardamos los datos.')
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

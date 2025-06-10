@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { authFetch } from '../utils/authFetch';
 
 const RegisterForm = () => {
   const [formData, setFormData] = useState({

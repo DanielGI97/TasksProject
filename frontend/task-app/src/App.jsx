@@ -8,15 +8,20 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 function App() {
   const [token, setToken] = useState(localStorage.getItem('access') || null);
 
-  const handleLogin = (accessToken, refreshToken) => {
+  const handleLogin = (accessToken, refreshToken, username) => {
+  
     localStorage.setItem('access', accessToken);
     localStorage.setItem('refresh', refreshToken);
+    localStorage.setItem('username', username);
+
     setToken(accessToken);
   };
 
   const handleLogout = () => {
+
     localStorage.removeItem('access');
     localStorage.removeItem('refresh');
+
     setToken(null);
   };
 
@@ -26,7 +31,14 @@ function App() {
       <header>
 
         <h1>Task App</h1>
-        {token && <button onClick={handleLogout}>Cerrar sesión</button>}
+        {token && 
+        <>
+
+          <button onClick={handleLogout}>Cerrar sesión</button>
+          <span>¡Bienvenid@ {localStorage.getItem('username')}!</span>
+
+        </>
+        }
 
       </header>
       <main>
@@ -35,15 +47,22 @@ function App() {
 
           {!token ? (
             <>
-              <Route path="/login" element={<LoginForm onLogin={handleLogin} />}></Route>
-              <Route path="/register" element={<RegisterForm/>}></Route>
-              <Route path="*" element={<Navigate to="/login"></Navigate>}></Route>
+              <Route path="/login" element={<LoginForm onLogin={handleLogin} />}/>
+              <Route path="/register" element={<RegisterForm/>}/>
+              <Route path="*" element={<Navigate to="/login"></Navigate>}/>
             </>           
           ) : (
             <>
               <Route path="/tasks" element={<TaskList token={token} />}></Route>
               <Route path="*" element={<Navigate to="/tasks"></Navigate>}></Route>
             </>
+            /*
+            <>
+              <Route path="/user/:username" element={<UserProfile token={token} />}/>
+              <Route path="/user/:username/:tasklist" element={<Navigate to="/tasks"></Navigate>}/>
+              <Route path="/user/:username/:tasklist/:task" element={<Navigate to="/tasks"></Navigate>}/>
+            </>
+            */
             
           )}
         </Routes>

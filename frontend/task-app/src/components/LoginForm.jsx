@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { authFetch } from '../utils/authFetch';
 
 const LoginForm = ({ onLogin }) => {
   const [formData, setFormData] = useState({ username: '', password: '' });
   const [message, setMessage] = useState('');
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData(prev => ({
@@ -28,17 +29,15 @@ const LoginForm = ({ onLogin }) => {
       const data = await res.json();
 
       if (res.ok) {
-        localStorage.setItem('access', data.access);
-        localStorage.setItem('refresh', data.refresh);
-        setMessage('Sesión iniciada');
-        onLogin(data.access, data.refresh);  // Puedes levantar el estado hacia App
+
+        onLogin(data.access, data.refresh, formData.username);  // Puedes levantar el estado hacia App
       } else {
-        setMessage(data.detail || 'Error al iniciar sesión');
+        setMessage('ERROR AL INICIAR SESIÓN: ',data.detail || 'Error al iniciar sesión');
       }
     } catch (err) {
       console.error(err);
-      setMessage('Error de red');
-    }
+      setMessage('ERROR DE RED');
+    }º  
   };
 
   return (

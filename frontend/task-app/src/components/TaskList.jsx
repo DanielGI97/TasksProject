@@ -53,6 +53,7 @@ const TaskList = ({ token }) => {
     <div>
       <button onClick={() => setLookTaskForm(!lookTaskForm)}>
         {lookTaskForm ? 'Cancelar' : 'Crear nueva tarea'}
+        {console.log('Valor de lookTaskForm: ',lookTaskForm)}
       </button>
 
       {lookTaskForm && (
