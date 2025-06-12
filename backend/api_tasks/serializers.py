@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
-from api_tasks.models import Task, Category
+from api_tasks.models import Task, TaskList
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.contrib.auth import authenticate
 from django.core.validators import validate_email
@@ -9,25 +9,29 @@ from django.core.exceptions import ValidationError
 
 class UserSerializer(serializers.ModelSerializer):
     tasks = serializers.PrimaryKeyRelatedField(many=True, queryset=Task.objects.all())
+    tasks_list = serializers.PrimaryKeyRelatedField(many=True, queryset=TaskList.objects.all())
 
     class Meta:
         model = User
         fields = ['id', 'username', 'tasks', 'email']
 
-class CategorySerializer(serializers.ModelSerializer):
-    
-    class Meta:
-        model = Category
-        fields = '__all__'
-
 class TaskSerializer(serializers.ModelSerializer):
     
     user = serializers.ReadOnlyField(source='user.username')
+    task_list = serializers.ReadOnlyField(source='task_list.id')
 
     class Meta:
         model = Task
         fields = '__all__'
 
+class TaskListSerializar(serializers.ModelSerializer):
+
+    user = serializers.ReadOnlyField(source='user.username')
+    tasks = serializers.PrimaryKeyRelatedField(many=True, queryset=Task.objects.all())
+
+    class Meta:
+        model = TaskList
+        fields = '__all__'
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):

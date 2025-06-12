@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
-from api_tasks.models import Category, Task
+from api_tasks.models import Task, TaskList
 from rest_framework import permissions, viewsets
-from api_tasks.serializers import UserSerializer, CategorySerializer, TaskSerializer
+from api_tasks.serializers import UserSerializer, TaskSerializer, TaskListSerializar
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
@@ -13,7 +13,18 @@ from datetime import timedelta
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def user_content(request, user_id,format=None):
+def user_task_lists(request, format=None):
+    
+    """
+    GET: Obtener todas las TaskLists del usuario autenticado
+    POST: Crear una nueva TaskList para el usuario autenticado
+    """
+
+    if request.method == 'GET':
+
+        #Obtener todas las listas del usuario.
+        task_lists = TaskList.objects.filter(user=request.user)
+    
     return Response()
 
 @api_view(['GET','DELETE'])
@@ -23,7 +34,7 @@ def list_content(request,format=None):
 
 @api_view(['GET','POST'])
 @permission_classes([IsAuthenticated])
-def tasks_list(request,format=None):
+def taskList_tasks(request,task_list_id,format=None):
     """
     List all code snippets, or create a new snippet.
     """
@@ -31,13 +42,18 @@ def tasks_list(request,format=None):
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
 
+    #Cogemos la task_list específica para recoger las tareas de la misma.
     try:
-        tasks = Task.objects.filter(user=request.user)
-        print(tasks)
-    except Task.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
-
+        task_list = TaskList.objects.get(id=task_list_id, user=request.user)
+    except TaskList.DoesNotExist:
+        return Response(
+            {'error': f'TaskList con ID {task_list_id} no encontrada o no tienes permisos'}, 
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
     if request.method == 'GET':
+        tasks = Task.objects.filter(user=request.user, task_list = task_list)
+        print(tasks)
         serializer = TaskSerializer(tasks, many=True)
         return Response(serializer.data)
 
@@ -90,16 +106,6 @@ def register_user(request):
 
     user = User.objects.create_user(username=username, email=email, password=password)
     return Response({'message': 'Usuario creado correctamente.'}, status=status.HTTP_201_CREATED)
-
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def category_list(request):
-    try:
-        categories = Category.objects.all()
-        categories_serializer = CategorySerializer(categories, many=True)
-        return Response(categories_serializer.data)
-    except Category.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
     
 @api_view(['PATCH','DELETE'])
 @permission_classes([IsAuthenticated])
